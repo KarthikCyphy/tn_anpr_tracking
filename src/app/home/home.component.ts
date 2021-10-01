@@ -71,7 +71,7 @@ export class HomeComponent implements OnInit {
 
   // For download PDF
   title = 'Vehicle Movement List';
-  head = [['Vehicle Number', 'Vehicle Type', 'Date & Time']];
+  head = [['Vehicle Number', 'Vehicle Type',]];
   data = [];
   currentDateandTime: any = {'date': '', 'time': ''};
 
@@ -146,7 +146,6 @@ export class HomeComponent implements OnInit {
             const data = {
               'vehicleNumber': value.vehicleNumber, 
               'vehicleType': value.vehicleType, 
-              'time': moment(value.time).format('DD-MM-YYYY HH:mm'),
             }
             tempArr.push(data);
             if(key == response.returnObject.length -1)
@@ -178,8 +177,7 @@ export class HomeComponent implements OnInit {
       }); 
       this.selectedEventData = rowClickedData;
       this.selectedEventData.vehicleNumber = this.commonUIComponent.vehicleNumberFormatter(rowClickedData.vehicleNumber);
-      this.modalService.open(content, { size: modalType == 'viewSnapshot' ? 'lg' : 'xl', backdrop: 'static', centered: true });
-            
+      this.modalService.open(content, { size: modalType == 'viewSnapshot' ? 'lg' : 'xl', backdrop: 'static', centered: true });     
     }
   }
 

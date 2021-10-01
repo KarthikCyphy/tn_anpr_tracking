@@ -1,7 +1,8 @@
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
-const ipAddress = '10.0.0.3';
+// const ipAddress = 'host.docker.internal';
+const ipAddress = '145.133.9.161';
    
 export const environment = {
   production: true,

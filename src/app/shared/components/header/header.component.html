@@ -11,7 +11,7 @@
     <div class="header-title">
       <h2 class="p-t-10">Vehicle Tracking System</h2>
     </div>
-    <div class="mobile-sidebar" *ngIf="authService.userData.roles[0] == 'Admin'">
+    <div class="mobile-sidebar" *ngIf="authService.userData.roles[0] != 'Admin'">
       <div class="media-body text-right switch-sm">
         <label class="switch">
           <a href="javascript:void(0)" (click)="collapseSidebar()">
@@ -22,7 +22,7 @@
     </div>
     <div class="nav-right col">
       <ul class="nav-menus" [ngClass]="{'open' : openNav}">        
-        <li>
+        <!-- <li>
           <form class="form-inline search-form">
             <div class="form-group">
               <input class="form-control-plaintext" [class.open]="isOpenMobile" [(ngModel)]="text"
@@ -36,7 +36,7 @@
               </span>
             </div>
           </form>
-        </li>
+        </li> -->
         <!-- <li>
           <label class="f-left f-w-600">CONVOY</label>
           <div class="custom-control custom-switch">

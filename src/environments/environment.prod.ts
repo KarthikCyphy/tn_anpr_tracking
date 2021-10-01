@@ -1,4 +1,4 @@
-const ipAddress = '145.133.9.162';
+const ipAddress = 'host.docker.internal';
    
 export const environment = {
   production: true,
