@@ -1,4 +1,4 @@
-const ipAddress = 'host.docker.internal';
+const ipAddress = window.location.href.split('//')[1].split(':')[0];
    
 export const environment = {
   production: true,
