@@ -12,8 +12,8 @@ const routes: Routes = [
     // canActivateChild: [AdminGuard],
     children: content
   },
-  { path: '**', redirectTo: 'app/dashboard', pathMatch: 'full' },
-  { path: '', redirectTo: 'app/dashboard', pathMatch: 'full' }
+  { path: '**', redirectTo: 'app/home', pathMatch: 'full' },
+  { path: '', redirectTo: 'app/home', pathMatch: 'full' }
 ];
 
 @NgModule({
