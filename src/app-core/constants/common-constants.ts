@@ -21,4 +21,9 @@ export class CommonConstants {
         settingPermissionErrorMessage: 'You do not have permission to access this setting.'
     };
 
+    static readonly dataTableConstant = {
+        page: 1,
+        pageSize: 20,
+    };
+
 }

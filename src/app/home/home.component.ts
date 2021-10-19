@@ -7,6 +7,7 @@ import { AuthService } from 'src/app-core/auth/auth.service';
 import { CommonUiService } from 'src/app-core/services/common-ui.service';
 import { HttpService } from 'src/app-core/services/http.service';
 import { LoaderService } from 'src/app-core/services/loader.service';
+import { CommonConstants } from 'src/app-core/constants/common-constants';
 import * as moment from 'moment';
 
 // import * as _ from 'lodash';
@@ -49,8 +50,8 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  pageSize = 10;
-  page = 1;
+  pageSize = CommonConstants.dataTableConstant.pageSize;
+  page = CommonConstants.dataTableConstant.page;
 
   selectedTypeofList: string;
   showDatepicker: boolean = false;
@@ -77,6 +78,11 @@ export class HomeComponent implements OnInit {
 
   onDateTimeModified(){
     if (this.fromDate != null && this.toDate != null) {
+      if(new Date(this.fromDate) >= new Date(this.toDate)){
+        this.toastService.error('Invalid date range.');
+        return;
+      }
+
       this.showDatepicker = false;
       this.getListMovements('byDate');
     }
@@ -110,6 +116,11 @@ export class HomeComponent implements OnInit {
       }
     }));
   }
+
+  getCurrentDateAndTime() {
+    this.currentDateandTime.date = this.dateFormater(new Date()).split(' ')[0];
+    this.currentDateandTime.time = this.dateFormater(new Date()).split(' ')[1];
+  };
 
   getListMovements(type: string) {
     let inputData = {'fromDateTime': '', 'toDateTime': ''};
@@ -246,7 +257,8 @@ export class HomeComponent implements OnInit {
     // doc.output('dataurlnewwindow')
 
     // below line for Download PDF document  
-    doc.save(this.title +'.pdf');
+    this.getCurrentDateAndTime();
+    doc.save(this.title+'-'+ this.currentDateandTime.date +'-'+ this.currentDateandTime.time +'.pdf');
   }
 
 }

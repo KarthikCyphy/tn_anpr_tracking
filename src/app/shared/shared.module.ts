@@ -23,6 +23,7 @@ import { CustomizerService } from "./services/customizer.service";
 // import { CommonUiService } from './services/common-ui.service';
 // Directives
 import { ToggleFullscreenDirective } from "./directives/fullscreen.directive";
+import { DateTimePickerComponent } from './components/date-time-picker/date-time-picker.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { ToggleFullscreenDirective } from "./directives/fullscreen.directive";
     ContentLayoutComponent,
     FeatherIconsComponent,
     ToggleFullscreenDirective,
-    CustomizerComponent
+    CustomizerComponent,
+    DateTimePickerComponent
   ],
   imports: [
     CommonModule,
@@ -45,7 +47,8 @@ import { ToggleFullscreenDirective } from "./directives/fullscreen.directive";
   exports: [
     LoaderComponent,
     FeatherIconsComponent,
-    UtilsModule
+    UtilsModule,
+    DateTimePickerComponent
   ],
   providers: [
     NavService,

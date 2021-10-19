@@ -1,4 +1,4 @@
-const ipAddress = window.location.href.split('//')[1].split(':')[0];
+const ipAddress = window.location.hostname;
    
 export const environment = {
   production: true,
