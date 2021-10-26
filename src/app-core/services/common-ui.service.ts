@@ -64,13 +64,10 @@ export class CommonUiService {
   }
 
   removeUnderscores(stringValue: string) {
+    if(stringValue == null)
+    return '-';
+    
     let value = stringValue.replace(/[/_/]/g, ' ');
-    // let value = stringValue.toLocaleLowerCase();
-    // value = value.charAt(0).toUpperCase() + value.slice(1);
-    // if (!_.isString(value)) {
-    //   return value;
-    // }
-    // return value.replace(/[/_/]/g, ' ');
     return value.toLowerCase().replace( /\b./g, function(a){ return a.toUpperCase(); } );
   };
 

@@ -29,7 +29,11 @@ export class HttpService {
       localData = JSON.parse(unescape(atob(localStorage.getItem(AuthConstants.AUTH))));
       // headers = headers.append('access_token',localData.accessToken);
     }
+
     const options = { headers: headers, withCredintials: false };
+    if(serviceName.includes('download'))
+      options['responseType'] = 'arraybuffer';
+      
     const url = serviceName.includes('irakshan/') ? environment.nodeApiRestUrl + serviceName : environment.apiRestUrl + serviceName;
     
     // if(url.includes('irakshan/')){

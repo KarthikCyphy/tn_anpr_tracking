@@ -6,21 +6,10 @@
           <div class="row">
             <div class="col-md-6">
               <h5>Vehicle Movement</h5>
-            </div>
-            <div class="col-md-6 text-right">
-              <label>Page Size</label>
-              <select class="m-l-30 form-control displayInline" style="width: 13%;" [(ngModel)]="pageSize">
-                <option value="" disabled>-- Select --</option>
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="15">15</option>
-                <option value="20">20</option>
-                <option value="25">25</option>
-              </select>
-            </div>
+            </div>            
           </div>
           <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-3">
               <div class="p-2 animate-chk">
                 <div class="row">
                   <div class="">
@@ -37,17 +26,22 @@
                   </div>
                 </div>
               </div>
+            </div>            
+            <div class="col-sm-6 row">
+              <label for="inputEmail3" class="col-sm-3 col-form-label">By Video Source : </label>
+              <div class="col-sm-9">
+                <select class="form-control displayInline" [(ngModel)]="selectedVideoSources" (ngModelChange)="getListMovementsByVideoSources()">
+                  <option value="" disabled>-- Select Video Sources--</option>
+                  <option *ngFor="let videoSourcesList of videoSourcesLists" [ngValue]="videoSourcesList">{{videoSourcesList}}</option>
+                </select>
+              </div>              
             </div>
-            <div class="col-sm-4 m-t-10">
-              <span *ngIf="selectedDate.fromDate && selectedDate.toDate" class="f-14"><span class="f-w-600">From:</span>
-                {{selectedDate.fromDate}} <span class="f-w-600">To:</span> {{selectedDate.toDate}}</span>
-            </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
               <div class="pull-right right-header">
                 <input type='text' class="filter-ngx form-control" [(ngModel)]="filterTerm"
                   placeholder='Type to search...' (change)="page = 1" (ngModelChange)="page = 1" />
                 <button [disabled]="!vehicleMovementList.length" placement="top" ngbtooltip="Download as PDF"
-                  type="button" (click)="downloadDataAsPdf()" class="btn btn-primary mr-1 m-l-10">
+                  type="button" (click)="downloadSnapshotreport()" class="btn btn-primary mr-1 m-l-10">
                   <i class="fa fa-download f-14"></i>
                 </button>
               </div>
@@ -84,6 +78,9 @@
                   <tr>
                     <th scope="col">Number</th>
                     <th scope="col">Type</th>
+                    <th scope="col">Make</th>
+                    <th scope="col">Model</th>
+                    <th scope="col">Color</th>
                     <th scope="col"></th>
                   </tr>
                 </thead>
@@ -98,6 +95,15 @@
                     <td (click)="openViewDetailsModal(detailsContenet, vehicleMovementLists, 'viewDetail')">
                       {{commonUIComponent.removeUnderscores(vehicleMovementLists.vehicleType)}}
                     </td>
+                    <td (click)="openViewDetailsModal(detailsContenet, vehicleMovementLists, 'viewDetail')">
+                      {{commonUIComponent.removeUnderscores(vehicleMovementLists.make)}}
+                    </td>
+                    <td (click)="openViewDetailsModal(detailsContenet, vehicleMovementLists, 'viewDetail')">
+                      {{commonUIComponent.removeUnderscores(vehicleMovementLists.model)}}
+                    </td>
+                    <td (click)="openViewDetailsModal(detailsContenet, vehicleMovementLists, 'viewDetail')">
+                      {{commonUIComponent.removeUnderscores(vehicleMovementLists.color)}}
+                    </td>
                     <td>
                       <button *ngIf="vehicleMovementLists.imagePath" placement="top" ngbtooltip="snapshot" type="button"
                         class="btn btn-primary btn-xs btn-pill btn-air-primary m-r-5"
@@ -107,15 +113,34 @@
                     </td>
                   </tr>
                   <tr class="NoDataAvailable" *ngIf="!vehicleMovementList.length">
-                    <td colspan="4" class="text-center">No Data Found.</td>
+                    <td colspan="7" class="text-center">No Data Found.</td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <div class="pagination-top p-2" *ngIf="vehicleMovementList.length">
-              <ngb-pagination [collectionSize]="vehicleMovementList.length" [pageSize]="pageSize" [(page)]="page"
-                [maxSize]="5" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
-            </div>
+            <div class="row">
+              <div class="col-sm-4">
+                <div class="pagination-top p-2" *ngIf="vehicleMovementList.length">
+                  <ngb-pagination [collectionSize]="vehicleMovementList.length" [pageSize]="pageSize" [(page)]="page"
+                    [maxSize]="5" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
+                </div>
+              </div>
+              <div class="col-sm-4 m-t-10 text-center">
+                <span *ngIf="selectedDate.fromDate && selectedDate.toDate" class="f-14"><span class="f-w-600">From:</span>
+                  {{selectedDate.fromDate}} <span class="f-w-600">To:</span> {{selectedDate.toDate}}</span>
+              </div>   
+              <div class="col-sm-4 text-right p-r-40" *ngIf="vehicleMovementList.length">
+                <label>Page Size</label>
+                <select class="m-l-30 form-control displayInline" style="width: 16%;" [(ngModel)]="pageSize">
+                  <option value="" disabled>-- Select --</option>
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                  <option value="20">20</option>
+                  <option value="25">25</option>
+                </select>
+              </div>
+            </div>                    
           </div>
         </div>
       </div>
@@ -170,6 +195,15 @@
                       <option value="BUS">BUS</option>
                       <option value="UNKNOWN">UNKNOWN</option>
                     </select>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <div class="form-group">
+                    <label>Video Source</label>
+                    <input type="text" class="form-control"
+                      [(ngModel)]="selectedEventData.videoSource" readonly>
                   </div>
                 </div>
               </div>

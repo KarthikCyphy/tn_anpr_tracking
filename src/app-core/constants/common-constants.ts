@@ -26,4 +26,9 @@ export class CommonConstants {
         pageSize: 20,
     };
 
+    static readonly loaderMessages = {
+        loaderDisplayText: '',
+        loaderDisplayTextForDownload: 'Generating reports, Please wait.',
+    };
+
 }

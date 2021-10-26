@@ -65,15 +65,15 @@ export class HomeComponent implements OnInit {
   selectedVehicleInfo: any = {};
 
   vehicleInfoForm: FormGroup;
-
   selectedEventData: any = {};
-
   vehiclesListData: any = [];
+  selectedVideoSources: string = 'All Videos';
+  videoSourcesLists: any = [];
 
   // For download PDF
-  title = 'Vehicle Movement List';
-  head = [['Vehicle Number', 'Vehicle Type',]];
-  data = [];
+  // title = 'Vehicle Movement List';
+  // head = [['Vehicle Number', 'Vehicle Type',]];
+  // data = [];
   currentDateandTime: any = {'date': '', 'time': ''};
 
   onDateTimeModified(){
@@ -97,6 +97,8 @@ export class HomeComponent implements OnInit {
   onClickTypeChange(type: string) {
     this.vehicleMovementList = [];
     this.selectedDate = {};
+    this.selectedTypeofList = type;
+    this.selectedVideoSources = '';
     if (type == 'todays')
       this.getListMovements(type);
     else
@@ -147,32 +149,81 @@ export class HomeComponent implements OnInit {
       }
     }
 
-    if (!this.commonUIComponent.isEmptyObject(inputData)) {      
-      this.httpService.post('vvadmin/getvehicletrackingdetailsbetweendates', { "requestParams": inputData }).subscribe(
+    if (!this.commonUIComponent.isEmptyObject(inputData)) {    
+      this.videoSourcesLists = [];  
+      this.selectedEventData = {};
+
+      this.httpService.post('offlinevi/getvehicletrackingdetailsbetweendates', { "requestParams": inputData }).subscribe(
         (response: any) => {
           this.vehicleMovementList = response.returnObject;
           this.filterTerm = ''; this.page = 1;
-          let tempArr =[];
-          _.cloneDeep(response.returnObject).forEach((value,key) => {
-            const data = {
-              'vehicleNumber': value.vehicleNumber, 
-              'vehicleType': value.vehicleType, 
-            }
-            tempArr.push(data);
-            if(key == response.returnObject.length -1)
-              this.data = this.commonUIComponent.convertDataToDownloadPDF(_.cloneDeep(tempArr));
-          });
+          // let tempArr =[];
+          // _.cloneDeep(response.returnObject).forEach((value,key) => {
+          //   const data = {
+          //     'vehicleNumber': value.vehicleNumber, 
+          //     'vehicleType': value.vehicleType, 
+          //   }
+          //   tempArr.push(data);
+          //   if(key == response.returnObject.length -1)
+          //     this.data = this.commonUIComponent.convertDataToDownloadPDF(_.cloneDeep(tempArr));
+          // });
           this.loaderService.hide();
         },
         (error) => { //error() callback
           this.httpService.serverErrorMethod(error);
-        });
+      });
+
+      this.httpService.post('offlinevi/getallvideosourcesbetweendateandtime', { "requestParams": inputData }).subscribe(
+        (response: any) => {
+          this.videoSourcesLists = response.returnObject;
+          this.videoSourcesLists.unshift('All Videos');
+          this.loaderService.hide();
+        },
+        (error) => { //error() callback
+          this.httpService.serverErrorMethod(error);
+      });
     }
 
     this.vehicleInfoForm = this.fb.group({     
       vehicleNumber: ['', [Validators.required]],
       vehicleType: ['', [Validators.required]],
     });
+  }
+
+  getListMovementsByVideoSources() {
+    if(this.selectedVideoSources != 'All Videos'){    
+      let inputData =  this.selectedVideoSources;
+
+      this.vehicleMovementList = [];
+      this.selectedEventData = {};
+
+      this.httpService.post('offlinevi/getvehiclemovmentdetailsbyvideosource', { "requestParams": inputData }).subscribe(
+        (response: any) => {
+          this.vehicleMovementList = response.returnObject;
+          this.filterTerm = ''; this.page = 1;
+          // let tempArr =[];
+          // _.cloneDeep(response.returnObject).forEach((value,key) => {
+          //   const data = {
+          //     'vehicleNumber': value.vehicleNumber, 
+          //     'vehicleType': value.vehicleType, 
+          //   }
+          //   tempArr.push(data);
+          //   if(key == response.returnObject.length -1)
+          //     this.data = this.commonUIComponent.convertDataToDownloadPDF(_.cloneDeep(tempArr));
+          // });
+          this.loaderService.hide();
+        },
+        (error) => { //error() callback
+          this.httpService.serverErrorMethod(error);
+      });
+
+      this.vehicleInfoForm = this.fb.group({     
+        vehicleNumber: ['', [Validators.required]],
+        vehicleType: ['', [Validators.required]],
+      });
+    }else{
+      this.getListMovements(this.selectedTypeofList);
+    }
   }
 
   openViewDetailsModal(content, rowClickedData: any, modalType) {
@@ -186,8 +237,8 @@ export class HomeComponent implements OnInit {
         (error) => { //error() callback
           this.httpService.serverErrorMethod(error);
       }); 
-      this.selectedEventData = rowClickedData;
-      this.selectedEventData.vehicleNumber = this.commonUIComponent.vehicleNumberFormatter(rowClickedData.vehicleNumber);
+      this.selectedEventData = _.cloneDeep(rowClickedData);
+      this.selectedEventData.vehicleNumber = this.commonUIComponent.vehicleNumberFormatter(this.selectedEventData.vehicleNumber);
       this.modalService.open(content, { size: modalType == 'viewSnapshot' ? 'lg' : 'xl', backdrop: 'static', centered: true });     
     }
   }
@@ -207,10 +258,15 @@ export class HomeComponent implements OnInit {
         "vehicleEntryTime": this.selectedEventData.vehicleEntryDate,
         "vehicleEntryDate": this.selectedEventData.vehicleEntryDate,
       }
-      this.httpService.post('vvadmin/addorupdatevehicletrackingdetails', { "requestParams" : inputData }).subscribe(
+      this.httpService.post('offlinevi/addorupdatevehicletrackingdetails', { "requestParams" : inputData }).subscribe(
         (response: any) => {
           if(response.success){
+            this.vehicleMovementList.forEach((value,key) => {
+              if(value.id == this.selectedEventData.id)
+              this.vehicleMovementList[key] = response.returnObject;
+            });
             this.toastService.success('Vehicle details updated successfully');
+            this.selectedEventData = {};
             this.modalService.dismissAll();
           }
           this.loaderService.hide();
@@ -235,30 +291,66 @@ export class HomeComponent implements OnInit {
       });
   }
 
-  downloadDataAsPdf() {
-    var doc = new jsPDF();
-
-    doc.setFontSize(18);
-    doc.text(this.title, 11, 8);
-    doc.setFontSize(11);
-    doc.setTextColor(100);
-
-
-    (doc as any).autoTable({
-      head: this.head,
-      body: this.data,
-      theme: 'plain',
-      didDrawCell: data => {
-        // console.log(data.column.index)
-      }
-    })
-
-    // below line for Open PDF document in new tab
-    // doc.output('dataurlnewwindow')
-
-    // below line for Download PDF document  
-    this.getCurrentDateAndTime();
-    doc.save(this.title+'-'+ this.currentDateandTime.date +'-'+ this.currentDateandTime.time +'.pdf');
+  downloadSnapshotreport() {
+    let url = '';
+    let inputData = {};
+    if(this.selectedVideoSources == '' || this.selectedVideoSources == 'All Videos'){
+      url = 'downloadvehicletrackingdetailsbetweendatesnapshotreport';
+      inputData = {
+        "fromDateTime": this.selectedDate.fromDate+":59",
+        "toDateTime": this.selectedDate.toDate+":59"
+      };
+    }else{
+      url = 'downloadvehicletrackingdetailsbyvideosourcesnapshotreport';
+      inputData = this.selectedVideoSources;
+    }
+    if(url != ''){
+      this.loaderService.sendLoadingText(CommonConstants.loaderMessages.loaderDisplayTextForDownload);
+      this.httpService.post('offlinevi/'+ url, { "requestParams": inputData }).subscribe(
+        (response: any) => {
+          this.loaderService.hide();
+          this.loaderService.sendLoadingText('');
+          this.downloadDataAsPdf(response);
+        },
+        (error) => { //error() callback
+          this.httpService.serverErrorMethod(error);
+      });
+    }
   }
+
+  downloadDataAsPdf(data: any) {
+    var blob = new Blob([data], { type: "application/pdf" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    this.getCurrentDateAndTime();
+    a.download = 'Vehicle_tracking_snapshot_report_'+ this.selectedVideoSources +'_'+ this.currentDateandTime.date +'-'+ this.currentDateandTime.time ;
+    a.click();
+  }
+
+  // downloadDataAsPdf() {
+  //   var doc = new jsPDF();
+
+  //   doc.setFontSize(18);
+  //   doc.text(this.title, 11, 8);
+  //   doc.setFontSize(11);
+  //   doc.setTextColor(100);
+
+
+  //   (doc as any).autoTable({
+  //     head: this.head,
+  //     body: this.data,
+  //     theme: 'plain',
+  //     didDrawCell: data => {
+  //       // console.log(data.column.index)
+  //     }
+  //   })
+
+  //   // below line for Open PDF document in new tab
+  //   // doc.output('dataurlnewwindow')
+
+  //   // below line for Download PDF document  
+  //   this.getCurrentDateAndTime();
+  //   doc.save(this.title+'-'+ this.currentDateandTime.date +'-'+ this.currentDateandTime.time +'.pdf');
+  // }
 
 }
