@@ -16,6 +16,10 @@
   display: inline !important;
 }
 
+.divPadding0Px{
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
 
 .text-align-right{
   text-align: right;
@@ -66,7 +70,7 @@
   }
   tbody {
     display: block;
-    height: calc(100vh - 340px);
+    height: calc(100vh - 360px);
     overflow: auto;
   }
   thead, tbody tr {

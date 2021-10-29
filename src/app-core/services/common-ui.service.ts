@@ -100,7 +100,7 @@ export class CommonUiService {
       let tempArr = [];
       Object.keys(value).forEach((keys) => {        
         if(value[keys] == null)
-          value[keys] = '';
+          value[keys] = '-';
         switch(keys){
           case 'vehicleNumber':
             value[keys] = this.vehicleNumberFormatter(value[keys]);         
@@ -121,6 +121,15 @@ export class CommonUiService {
             value[keys] = this.enumModifier(value[keys]);         
             break;
           case 'vehicleVerificationType':
+            value[keys] = this.removeUnderscores(value[keys]);         
+            break;
+          case 'make':
+            value[keys] = this.removeUnderscores(value[keys]);         
+            break;
+          case 'model':
+            value[keys] = this.removeUnderscores(value[keys]);         
+            break;
+          case 'color':
             value[keys] = this.removeUnderscores(value[keys]);         
             break;
         }      

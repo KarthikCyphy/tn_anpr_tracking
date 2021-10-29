@@ -53,7 +53,6 @@ export class HomeComponent implements OnInit {
   pageSize = CommonConstants.dataTableConstant.pageSize;
   page = CommonConstants.dataTableConstant.page;
 
-  selectedTypeofList: string;
   showDatepicker: boolean = false;
   selectedDate: any = {};
   today: string;
@@ -71,9 +70,9 @@ export class HomeComponent implements OnInit {
   videoSourcesLists: any = [];
 
   // For download PDF
-  // title = 'Vehicle Movement List';
-  // head = [['Vehicle Number', 'Vehicle Type',]];
-  // data = [];
+  title = 'Vehicle Movement List';
+  head = [['Vehicle Number', 'Vehicle Type', 'Make', 'Model', 'Color', 'Updated On']];
+  data = [];
   currentDateandTime: any = {'date': '', 'time': ''};
 
   onDateTimeModified(){
@@ -82,9 +81,7 @@ export class HomeComponent implements OnInit {
         this.toastService.error('Invalid date range.');
         return;
       }
-
-      this.showDatepicker = false;
-      this.getListMovements('byDate');
+      this.getListMovements();
     }
   }
 
@@ -94,22 +91,13 @@ export class HomeComponent implements OnInit {
     return finalDate;
   }
 
-  onClickTypeChange(type: string) {
-    this.vehicleMovementList = [];
-    this.selectedDate = {};
-    this.selectedTypeofList = type;
-    this.selectedVideoSources = '';
-    if (type == 'todays')
-      this.getListMovements(type);
-    else
-      this.fromDate = null; this.toDate = null;
-  }
-
   ngOnInit(): void {
-    this.selectedTypeofList = 'todays';
-    this.today = this.dateFormater(new Date());
+    this.today =(moment(new Date()).format('YYYY-MM-DD') + 'T') ;
+    this.fromDate = this.today + '00:00:00+05:30'; 
+    this.toDate = this.today + '23:59:59+05:30';
+  
     this.currentDateandTime.date = this.dateFormater(new Date());
-    this.getListMovements(this.selectedTypeofList);
+    this.getListMovements();
 
     this.componentSubscriptions.add(this.commonUIComponent.getSideNavToggleValue.subscribe((data: any) => {
       if (!this.commonUIComponent.isEmptyObject(data)) {
@@ -124,29 +112,18 @@ export class HomeComponent implements OnInit {
     this.currentDateandTime.time = this.dateFormater(new Date()).split(' ')[1];
   };
 
-  getListMovements(type: string) {
+  getListMovements() {
     let inputData = {'fromDateTime': '', 'toDateTime': ''};
-    if (type == 'todays') {
+   
+    if (this.fromDate != null && this.toDate != null) {
       this.selectedDate = {};
-      this.fromDate = null; this.toDate = null;
       inputData = {
-        "fromDateTime": this.today.split(" ")[0] + " 00:00:00",
-        "toDateTime": this.today.split(" ")[0] + " 23:59:59"
+        "fromDateTime": this.dateFormater(this.fromDate)+":59",
+        "toDateTime": this.dateFormater(this.toDate)+":59"
       };
       this.selectedDate = { 
         'fromDate': inputData.fromDateTime.substring(0, inputData.fromDateTime.length - 3),                       
-        "toDate": inputData.toDateTime .substring(0, inputData.toDateTime.length - 3) };
-    } else {
-      if (this.fromDate != null && this.toDate != null) {
-        this.selectedDate = {};
-        inputData = {
-          "fromDateTime": this.dateFormater(this.fromDate)+":59",
-          "toDateTime": this.dateFormater(this.toDate)+":59"
-        };
-        this.selectedDate = { 
-          'fromDate': inputData.fromDateTime.substring(0, inputData.fromDateTime.length - 3),                       
-          "toDate": inputData.toDateTime.substring(0, inputData.toDateTime.length - 3) };
-      }
+        "toDate": inputData.toDateTime.substring(0, inputData.toDateTime.length - 3) };
     }
 
     if (!this.commonUIComponent.isEmptyObject(inputData)) {    
@@ -157,16 +134,20 @@ export class HomeComponent implements OnInit {
         (response: any) => {
           this.vehicleMovementList = response.returnObject;
           this.filterTerm = ''; this.page = 1;
-          // let tempArr =[];
-          // _.cloneDeep(response.returnObject).forEach((value,key) => {
-          //   const data = {
-          //     'vehicleNumber': value.vehicleNumber, 
-          //     'vehicleType': value.vehicleType, 
-          //   }
-          //   tempArr.push(data);
-          //   if(key == response.returnObject.length -1)
-          //     this.data = this.commonUIComponent.convertDataToDownloadPDF(_.cloneDeep(tempArr));
-          // });
+          let tempArr =[];
+          _.cloneDeep(response.returnObject).forEach((value,key) => {
+            const data = {
+              'vehicleNumber': value.vehicleNumber, 
+              'vehicleType': value.vehicleType, 
+              'make': value.make,
+              'model': value.model,
+              'color': value.color,
+              'updatedOn': value.updatedOn
+            }
+            tempArr.push(data);
+            if(key == response.returnObject.length -1)
+              this.data = this.commonUIComponent.convertDataToDownloadPDF(_.cloneDeep(tempArr));
+          });
           this.loaderService.hide();
         },
         (error) => { //error() callback
@@ -176,7 +157,8 @@ export class HomeComponent implements OnInit {
       this.httpService.post('offlinevi/getallvideosourcesbetweendateandtime', { "requestParams": inputData }).subscribe(
         (response: any) => {
           this.videoSourcesLists = response.returnObject;
-          this.videoSourcesLists.unshift('All Videos');
+          if(this.videoSourcesLists.length >= 1)
+            this.videoSourcesLists.unshift('All Videos');
           this.loaderService.hide();
         },
         (error) => { //error() callback
@@ -201,16 +183,20 @@ export class HomeComponent implements OnInit {
         (response: any) => {
           this.vehicleMovementList = response.returnObject;
           this.filterTerm = ''; this.page = 1;
-          // let tempArr =[];
-          // _.cloneDeep(response.returnObject).forEach((value,key) => {
-          //   const data = {
-          //     'vehicleNumber': value.vehicleNumber, 
-          //     'vehicleType': value.vehicleType, 
-          //   }
-          //   tempArr.push(data);
-          //   if(key == response.returnObject.length -1)
-          //     this.data = this.commonUIComponent.convertDataToDownloadPDF(_.cloneDeep(tempArr));
-          // });
+          let tempArr =[];
+          _.cloneDeep(response.returnObject).forEach((value,key) => {
+            const data = {
+              'vehicleNumber': value.vehicleNumber, 
+              'vehicleType': value.vehicleType, 
+              'make': value.make,
+              'model': value.model,
+              'color': value.color,
+              'updatedOn': value.updatedOn
+            }
+            tempArr.push(data);
+            if(key == response.returnObject.length -1)
+              this.data = this.commonUIComponent.convertDataToDownloadPDF(_.cloneDeep(tempArr));
+          });
           this.loaderService.hide();
         },
         (error) => { //error() callback
@@ -222,7 +208,7 @@ export class HomeComponent implements OnInit {
         vehicleType: ['', [Validators.required]],
       });
     }else{
-      this.getListMovements(this.selectedTypeofList);
+      this.getListMovements();
     }
   }
 
@@ -249,14 +235,6 @@ export class HomeComponent implements OnInit {
         "id": this.selectedEventData.id,
         "vehicleNumber": this.commonUIComponent.rawVehicleNumberFormatte(this.selectedEventData.vehicleNumber),
         "vehicleType": this.selectedEventData.vehicleType,
-        "time": this.selectedEventData.time,
-        "remarks": this.selectedEventData.remarks,
-        "verifiedBy": this.selectedEventData.verifiedBy,
-        "imagePath": this.selectedEventData.imagePath,
-        "ilprJson": this.selectedEventData.ilprJson,
-        "vehicleListingType": this.selectedEventData.vehicleListingType,
-        "vehicleEntryTime": this.selectedEventData.vehicleEntryDate,
-        "vehicleEntryDate": this.selectedEventData.vehicleEntryDate,
       }
       this.httpService.post('offlinevi/addorupdatevehicletrackingdetails', { "requestParams" : inputData }).subscribe(
         (response: any) => {
@@ -310,7 +288,7 @@ export class HomeComponent implements OnInit {
         (response: any) => {
           this.loaderService.hide();
           this.loaderService.sendLoadingText('');
-          this.downloadDataAsPdf(response);
+          this.downloadDataAsPdfFormat(response);
         },
         (error) => { //error() callback
           this.httpService.serverErrorMethod(error);
@@ -318,7 +296,7 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  downloadDataAsPdf(data: any) {
+  downloadDataAsPdfFormat(data: any) {
     var blob = new Blob([data], { type: "application/pdf" });
     var a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -327,30 +305,42 @@ export class HomeComponent implements OnInit {
     a.click();
   }
 
-  // downloadDataAsPdf() {
-  //   var doc = new jsPDF();
+  downloadDataAsPdf() {
+    var doc = new jsPDF();
 
-  //   doc.setFontSize(18);
-  //   doc.text(this.title, 11, 8);
-  //   doc.setFontSize(11);
-  //   doc.setTextColor(100);
+    doc.setFontSize(18);
+    doc.text(this.title, 11, 8);
+    doc.setFontSize(11);
+    doc.setTextColor(100);
 
+    (doc as any).autoTable({
+      head: this.head,
+      body: this.data,
+      theme: 'plain',
+      didDrawCell: data => {
+        // console.log(data.column.index)
+      }
+    })
+    this.addFooters(doc);
+    // below line for Open PDF document in new tab
+    // doc.output('dataurlnewwindow')
 
-  //   (doc as any).autoTable({
-  //     head: this.head,
-  //     body: this.data,
-  //     theme: 'plain',
-  //     didDrawCell: data => {
-  //       // console.log(data.column.index)
-  //     }
-  //   })
+    // below line for Download PDF document  
+    this.getCurrentDateAndTime();
+    doc.save(this.title+'-'+ this.selectedVideoSources +'_'+ this.currentDateandTime.date +'-'+ this.currentDateandTime.time +'.pdf');
+  }
 
-  //   // below line for Open PDF document in new tab
-  //   // doc.output('dataurlnewwindow')
-
-  //   // below line for Download PDF document  
-  //   this.getCurrentDateAndTime();
-  //   doc.save(this.title+'-'+ this.currentDateandTime.date +'-'+ this.currentDateandTime.time +'.pdf');
-  // }
+  addFooters(doc: any) {
+    const pageCount = doc.internal.getNumberOfPages()
+  
+    doc.setFont('helvetica', 'italic')
+    doc.setFontSize(8)
+    for (var i = 1; i <= pageCount; i++) {
+      doc.setPage(i)
+      doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 2, 287, {
+        align: 'center'
+      })
+    }
+  }
 
 }
