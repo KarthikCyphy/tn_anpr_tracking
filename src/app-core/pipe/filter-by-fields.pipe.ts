@@ -14,10 +14,12 @@ export class FilterByFieldsPipe implements PipeTransform {
       let itemFound: boolean;
       value = value.trim();
       fields.map(list => {
-        if (item[list].toLowerCase().indexOf(value.toLowerCase()) !== -1) {
-          itemFound = true;
-          return;
-        }
+        if(item[list] != null){
+          if (item[list].toLowerCase().indexOf(value.toLowerCase()) !== -1) {
+            itemFound = true;
+            return;
+          }
+        }        
       });
       return itemFound;
     });

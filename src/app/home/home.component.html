@@ -57,7 +57,7 @@
                 </thead>
                 <tbody>
                   <tr
-                    *ngFor="let vehicleMovementLists of vehicleMovementList | filter: filterTerm | slice: (page-1) * pageSize : page * pageSize"
+                    *ngFor="let vehicleMovementLists of vehicleMovementList | filterByFields: ['vehicleNumber', 'vehicleType', 'make', 'model', 'color'] : filterTerm | slice: (page-1) * pageSize : page * pageSize"
                     [ngClass]="{'rowhighlight' : vehicleMovementLists.id == selectedEventData.id}">
                     <td class="f-w-600"
                       (click)="openViewDetailsModal(detailsContenet, vehicleMovementLists, 'viewDetail')">
