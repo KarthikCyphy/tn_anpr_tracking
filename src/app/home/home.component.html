@@ -110,13 +110,13 @@
                       placeholder='Type to search...' (change)="page = 1" (ngModelChange)="page = 1" />
                     
                   </div>
-                  <div class="col-sm-4">
+                  <div class="col-sm-4 text-center m-t-5">
                     <button [disabled]="!vehicleMovementList.length" placement="top" ngbTooltip="Download snapshot reports"
-                      type="button" (click)="downloadSnapshotreport()" class="btn btn-primary mr-3">
+                      type="button" (click)="downloadSnapshotreport()" class="btn-sm btn-md btn-primary mr-3">
                       <i class="fa fa-image f-14"></i> 
                     </button>
                     <button [disabled]="!vehicleMovementList.length" placement="top" ngbTooltip="Download list reports"
-                      type="button" (click)="downloadDataAsPdf()" class="btn btn-primary mr-3">
+                      type="button" (click)="downloadDataAsPdf()" class="btn-sm btn-md btn-primary mr-3">
                       <i class="fa fa-list f-14"></i>
                     </button>
                   </div>
