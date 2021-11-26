@@ -48,6 +48,10 @@ export class HomeComponent implements OnInit {
       this.toastService.error('Unauthorised page access.');
       authService.forceLogout();
     }
+
+    this.uploadForm = this.fb.group({
+      upload: [''],
+    })
   }
 
   pageSize = CommonConstants.dataTableConstant.pageSize;
@@ -74,6 +78,10 @@ export class HomeComponent implements OnInit {
   head = [['Vehicle Number', 'Vehicle Type', 'Make', 'Model', 'Color', 'Updated On']];
   data = [];
   currentDateandTime: any = {'date': '', 'time': ''};
+
+  fileName: string = "No file selected";
+  file: File;
+  uploadForm: FormGroup;
 
   onDateTimeModified(){
     if (this.fromDate != null && this.toDate != null) {
@@ -341,6 +349,69 @@ export class HomeComponent implements OnInit {
         align: 'center'
       })
     }
+  }
+
+  openFileUploadModal(content) {
+    this.modalService.open(content, { size: 'lg', backdrop: 'static', centered: true });
+  }
+
+  uploadVideo(file: File) {
+    setTimeout(() => {
+      if (file) {
+        this.fileName = file.name;
+        this.file = file;
+        let fileFormat = this.fileName.split('.')[1];
+        if(fileFormat != 'mp4' && fileFormat != 'mov' && fileFormat != 'dav'){
+          this.toastService.error('Invalid video file.');
+          return;
+        }
+        this.uploadForm.patchValue({
+          upload: file
+        });
+        this.uploadForm.get('upload').updateValueAndValidity()
+  
+        var formData: any = new FormData();
+        formData.append('upload', this.uploadForm.get('upload').value);
+
+        this.loaderService.sendLoadingText(CommonConstants.loaderMessages.loaderDisplayTextForUploadingFile);
+        this.httpService.formDataPost('uploadvideo', formData).subscribe(
+          (response: any) => {            
+            if(response.success){
+              let result = JSON.parse(response.returnObject[0]);
+              this.loaderService.hide();
+              this.loaderService.sendLoadingText('');
+              this.modalService.dismissAll();
+
+              if(result.status_code+'' == '200'){
+                this.toastService.success('Video uploaded successfully');
+                let inputData = {
+                  "fromDateTime": this.dateFormater(this.fromDate)+":59",
+                  "toDateTime": this.dateFormater(this.toDate)+":59"
+                };
+                this.httpService.post('offlinevi/getallvideosourcesbetweendateandtime', { "requestParams": inputData }).subscribe(
+                  (response: any) => {
+                    this.videoSourcesLists = response.returnObject;
+                    if(this.videoSourcesLists.length >= 1)
+                      this.videoSourcesLists.unshift('All Videos');
+                    this.selectedVideoSources = this.fileName;
+                    this.getListMovementsByVideoSources();
+                    this.loaderService.hide();
+                  },
+                  (error) => { //error() callback
+                    this.httpService.serverErrorMethod(error);
+                });                
+              }
+              else{
+                this.toastService.error('Error occured while processing the video. Try again.');
+                this.ngOnInit();
+              }              
+            }            
+          },
+          (error) => { //error() callback
+            this.httpService.serverErrorMethod(error);
+        });
+      }
+    },500);    
   }
 
 }

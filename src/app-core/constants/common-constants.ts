@@ -29,6 +29,7 @@ export class CommonConstants {
     static readonly loaderMessages = {
         loaderDisplayText: '',
         loaderDisplayTextForDownload: 'Generating reports, Please wait.',
+        loaderDisplayTextForUploadingFile: 'Processing, Please wait.',
     };
 
 }

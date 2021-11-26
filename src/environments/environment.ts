@@ -2,12 +2,13 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 // const ipAddress = 'host.docker.internal';
-const ipAddress = '192.168.1.68';
+const ipAddress = '192.168.1.185';
    
 export const environment = {
   production: true,
   apiRestUrl: 'http://' + ipAddress + ':8102/',
   nodeApiRestUrl: 'http://' + ipAddress + ':8000/',
+  ANPRRestUrl: 'http://' + ipAddress + ':7105/',
   webSocketUrl: 'ws:/' + ipAddress + ':7104/events/vehicle/verification',  
 };
 /*

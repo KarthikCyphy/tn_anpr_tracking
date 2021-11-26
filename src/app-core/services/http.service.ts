@@ -60,6 +60,13 @@ export class HttpService {
     return this.http.get(url, options);
   }
 
+  formDataPost(serviceName: string, data: any){ 
+    this.loaderService.show();     
+    const url = environment.ANPRRestUrl + serviceName;
+
+    return this.http.post(url, data);
+  }
+
   serverErrorMethod(error: any) {
     if(error.status == 0)
       this.toastService.error('Server not found');
