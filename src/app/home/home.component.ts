@@ -309,7 +309,7 @@ export class HomeComponent implements OnInit {
     var a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     this.getCurrentDateAndTime();
-    a.download = 'Vehicle_tracking_snapshot_report_'+ this.selectedVideoSources +'_'+ this.currentDateandTime.date +'-'+ this.currentDateandTime.time ;
+    a.download = 'Vehicle_tracking_snapshot_report_'+ this.selectedVideoSources.split('.')[0] +'_'+ this.currentDateandTime.date +'-'+ this.currentDateandTime.time ;
     a.click();
   }
 
