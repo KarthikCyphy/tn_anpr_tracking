@@ -4,7 +4,7 @@
     <app-header (rightSidebarEvent)="rightSidebar($event)"></app-header>
     <!-- Page Body Start-->
     <div class="page-body-wrapper" [ngClass]="customizer.data.settings.sidebar.body_type">
-      <div *ngIf="authService.userData.roles[0] != 'Admin'" class="page-sidebar m-t-80" id="pages-sidebar" [class.open]="navServices.collapseSidebar"
+      <div *ngIf="authService.userData.roles[0] == 'Admin'" class="page-sidebar m-t-80" id="pages-sidebar" [class.open]="navServices.collapseSidebar"
         [ngClass]="customizer.data.settings.sidebar_backround"
         [attr.sidebar-layout]="this.customizer.data.settings.sidebar_setting">
         <app-sidebar></app-sidebar>

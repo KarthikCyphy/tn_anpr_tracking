@@ -38,32 +38,14 @@ export class NavService {
 	}
 
 	MENUITEMS: Menu[] = [
-		// {
-		// 	path: '/app/dashboard', title: 'Dashboard', type: 'link', icon: 'home', active: false, 
-		// },
 		{
-			path: '/app/home', title: 'Home', type: 'link', icon: 'home', active: false, 
+			path: '/app/home', title: 'Home', type: 'link', icon: 'home', active: true, 
 		},
-		// {
-		// 	path: '/app/gate', title: 'Gates', type: 'link', icon: 'airplay', active: true,
-		// },
-		// {
-		// 	path: '/app/light', title: 'Light Controllers', type: 'link', icon: 'zap', active: false, 
-		// },
-		// {
-		// 	path: '/app/camera', title: 'Cameras', type: 'link', icon: 'camera', active: false, 
-		// },		
-		// {
-		// 	path: '/app/vehicles', title: 'Vehicles', type: 'link', icon: 'truck', active: false, 
-		// },		
-		// {
-		// 	path: '/app/reports', title: 'Reports', type: 'link', icon: 'bar-chart-2', active: false,
-		// },
+		{
+			path: '/app/upload-video', title: 'Upload Video', type: 'link', icon: 'upload', active: false,
+		},
 	]
-
 
 	// Array
 	items = new BehaviorSubject<Menu[]>(this.MENUITEMS);
-
-
 }
