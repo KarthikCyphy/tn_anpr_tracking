@@ -32,4 +32,8 @@ export class CommonConstants {
         loaderDisplayTextForUploadingFile: 'Processing, Please wait.',
     };
 
+    static readonly uploadFile = {
+        MaxSize:5,
+        maxFileErrMsg: 'Files limit exceeded. Maximum 5 files only.'
+    }
 }

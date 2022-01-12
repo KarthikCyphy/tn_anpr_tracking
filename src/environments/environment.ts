@@ -9,7 +9,7 @@ export const environment = {
   apiRestUrl: 'http://' + ipAddress + ':8102/',
   nodeApiRestUrl: 'http://' + ipAddress + ':8000/',
   ANPRRestUrl: 'http://' + ipAddress + ':7105/',
-  webSocketUrl: 'ws:/' + ipAddress + ':7104/events/vehicle/verification',  
+  webSocketUrl: 'ws:/' + ipAddress + ':7105/events/ovi',  
 };
 /*
  * For easier debugging in development mode, you can import the following file

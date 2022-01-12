@@ -63,14 +63,16 @@
 
 .table{ 
   th{
-    padding: 10px !important;
+    padding: 2px !important;
+    vertical-align: initial !important;
   }
   td {
-    padding: 5px !important;
+    padding: 1px !important;
+    vertical-align: initial !important;
   }
   tbody {
     display: block;
-    height: calc(100vh - 360px);
+    height: calc(100vh - 335px);
     overflow: auto;
   }
   thead, tbody tr {
@@ -78,6 +80,7 @@
       width: 100%;
       table-layout: fixed;/* even columns width , fix width of table too*/
   }
+  font-size: 12px !important;
 }
 
 button[disabled]:hover,
