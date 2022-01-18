@@ -89,6 +89,10 @@ export class SidebarComponent {
     item.active = !item.active
   }
 
+  collapseSidebar() {
+    this.navServices.collapseSidebar = !this.navServices.collapseSidebar
+  }
+
   //Fileupload
   // readUrl(event: any) {
   //   if (event.target.files.length === 0)

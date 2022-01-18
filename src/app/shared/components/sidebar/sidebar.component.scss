@@ -2,4 +2,25 @@
     width: 205px;
     height: 70px;
 }
+.sidebar-collapse{    
+    position: absolute;
+    background: darkgray;
+    left: 250px;
+    top: calc(100% - 415px);
+    z-index: 100000;
+}
+.switch{
+    width: 50px !important;
+    -webkit-animation: rightarrow 0.5s infinite alternate ease-in-out;
+}
+
+@-webkit-keyframes rightarrow {
+    0% { -webkit-transform: translateX(0); opacity: 0.4 }
+  100% { -webkit-transform: translateX(0.4em); opacity: 0.6 }
+}
+
+.rightArr{
+    font-size: 50px;
+    color: white;    
+}
 

@@ -59,9 +59,9 @@ export class HeaderComponent implements OnInit {
     this.rightSidebarEvent.emit(this.right_sidebar)
   }
 
-  collapseSidebar() {
-    this.navServices.collapseSidebar = !this.navServices.collapseSidebar
-  }
+  // collapseSidebar() {
+  //   this.navServices.collapseSidebar = !this.navServices.collapseSidebar
+  // }
 
   openMobileNav() {
     this.openNav = !this.openNav;

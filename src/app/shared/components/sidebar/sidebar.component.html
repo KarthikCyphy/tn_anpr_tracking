@@ -113,6 +113,13 @@
     </li>
   </ul>
 </div>
+<div class="sidebar-collapse" *ngIf="authService.userData.roles[0] == 'Admin'">
+  <label class="switch">
+    <a href="javascript:void(0)" (click)="collapseSidebar()">
+      <i id="sidebar-toggle" [class]="navServices.collapseSidebar ? 'icofont icofont-rounded-right rightArr' : 'icofont icofont-rounded-left rightArr'"></i> 
+    </a>
+  </label>
+</div>
 <!-- <div class="bg-light font-dark m-t-50">
   <div class="row">
     <div class="col footer-copyright">
