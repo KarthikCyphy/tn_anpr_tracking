@@ -17,6 +17,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, Subscription } from 'rxjs';
 import jsPDF from 'jspdf';
 declare var _:any;
+declare var require
+const Swal = require('sweetalert2')
+
+
 export interface Message {
   author: string;
   message: string;
@@ -99,7 +103,7 @@ export class UploadVideoComponent implements OnInit {
   newDataStared: boolean = false;
 
   // For download PDF
-  title = 'Vehicle Movement List';
+  title = 'Vehicle_tracking_';
   head = [['Vehicle Number', 'Vehicle Type', 'Make', 'Model', 'Color', 'Updated On']];
   data = [];
   currentDateandTime: any = {'date': '', 'time': ''};
@@ -196,13 +200,6 @@ export class UploadVideoComponent implements OnInit {
     this.vehicleMovementList = [];
     this.videoSourcesLists = [];  
     this.selectedEventData = {};
-    this.socketDataMap = new Map();
-    this.selectedFilesMsg.forEach((value,key) => {
-      this.videoSourcesLists.push(value.fileName);
-      this.socketDataMap.set(value.fileName+'', {'fileName':value.fileName,'count': 0,'listData':[]});
-      if(this.videoSourcesLists.length >= 1 && this.selectedFilesMsg.length == key +1)
-        this.videoSourcesLists.unshift('All Videos');
-    });
     this.filterTerm = ''; this.page = 1;
   }
 
@@ -265,10 +262,18 @@ export class UploadVideoComponent implements OnInit {
 
   downloadSnapshotreport() {
     let url = 'downloadvehicletrackingdetailsbyvideosourcesnapshotreport';
-    let inputData = this.selectedVideoSources;
+    let inputData = [];
+    if(this.selectedVideoSources != 'All Videos')
+      inputData.push(this.selectedVideoSources);
+    else{
+      this.videoSourcesLists.forEach((value,key) => {
+        if(value != 'All Videos')
+          inputData.push(value);       
+      });
+    }
     if(url != ''){
       this.loaderService.sendLoadingText(CommonConstants.loaderMessages.loaderDisplayTextForDownload);
-      this.httpService.post('offlinevi/'+ url, { "requestParams": inputData }).subscribe(
+      this.httpService.post('offlinevi/'+ url, { "requestParams": inputData.join(",") }).subscribe(
         (response: any) => {
           this.loaderService.hide();
           this.loaderService.sendLoadingText('');
@@ -311,7 +316,7 @@ export class UploadVideoComponent implements OnInit {
 
     // below line for Download PDF document  
     this.getCurrentDateAndTime();
-    doc.save(this.title+'-'+ this.selectedVideoSources +'_'+ this.currentDateandTime.date +'-'+ this.currentDateandTime.time +'.pdf');
+    doc.save(this.title+ this.selectedVideoSources +'_'+ this.currentDateandTime.date +'-'+ this.currentDateandTime.time +'.pdf');
   }
 
   addFooters(doc: any) {
@@ -328,9 +333,33 @@ export class UploadVideoComponent implements OnInit {
   }
 
   openFileUploadModal(content) {
-    this.modalService.open(content, { size: 'xl', backdrop: 'static', centered: true });
-    this.selectedFilesMsg = [];
-    this.proceedFileUpload = true;
+    if(this.videoSourcesLists.length){
+      Swal.fire({
+        text: "New file(s) upload will clear the current data on the screen.Report for the current data can be still be downloaded from the Home screen later. Are you sure you want to continue with the upload ?", 
+        title: '',
+        type: 'warning',
+        icon: 'warning',
+        color: '#716add',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes'
+      }).then((result) => {
+        if (result.value) {
+          this.modalService.open(content, { size: 'xl', backdrop: 'static', centered: true });
+          this.selectedFilesMsg = [];
+          this.proceedFileUpload = true;
+          this.vehicleMovementList = [];
+          this.selectedEventData = {};
+        }
+      });
+    }else{
+      this.modalService.open(content, { size: 'xl', backdrop: 'static', centered: true });
+      this.selectedFilesMsg = [];
+      this.proceedFileUpload = true;
+      this.vehicleMovementList = [];
+      this.selectedEventData = {};
+    }
   }
 
   selectFiles(event) {
@@ -370,6 +399,13 @@ export class UploadVideoComponent implements OnInit {
     setTimeout(() => {
       this.selectedFilesMsg = this.selectedFilesMsg.filter((v,i,a)=>a.findIndex(t=>(t.fileName===v.fileName))===i);
       this.tempArrFiles = _.cloneDeep(this.selectedFilesMsg);
+      this.socketDataMap = new Map();    
+      this.selectedFilesMsg.forEach((value,key) => {
+        this.videoSourcesLists.push(value.fileName);
+        this.socketDataMap.set(value.fileName+'', {'fileName':value.fileName,'count': 0,'listData':[]});
+        if(this.videoSourcesLists.length >= 1 && this.selectedFilesMsg.length == key +1)
+          this.videoSourcesLists.unshift('All Videos');
+      });
     },25);
   }
 
@@ -424,7 +460,7 @@ export class UploadVideoComponent implements OnInit {
 
             if(data.status_code+'' == '200'){
               this.toastService.success('Video uploaded successfully');
-              if(this.selectedFilesMsg.length >= 1)
+              if(this.selectedFilesMsg.length <= 1)
                 this.selectedVideoSources = this.fileName;
               else
                 this.selectedVideoSources = 'All Videos';

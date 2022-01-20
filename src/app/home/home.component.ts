@@ -70,7 +70,7 @@ export class HomeComponent implements OnInit {
   newDataStared: boolean = false;
 
   // For download PDF
-  title = 'Vehicle Movement List';
+  title = 'Vehicle_tracking';
   head = [['Vehicle Number', 'Vehicle Type', 'Make', 'Model', 'Color', 'Updated On']];
   data = [];
   currentDateandTime: any = {'date': '', 'time': ''};
@@ -327,7 +327,7 @@ export class HomeComponent implements OnInit {
 
     // below line for Download PDF document  
     this.getCurrentDateAndTime();
-    doc.save(this.title+'-'+ this.selectedVideoSources +'_'+ this.currentDateandTime.date +'-'+ this.currentDateandTime.time +'.pdf');
+    doc.save(this.title+ this.selectedVideoSources +'_'+ this.currentDateandTime.date +'-'+ this.currentDateandTime.time +'.pdf');
   }
 
   addFooters(doc: any) {
