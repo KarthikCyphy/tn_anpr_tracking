@@ -139,15 +139,14 @@ export class UploadVideoComponent implements OnInit {
   };
 
   getListMovementsByVideoSources() {
-    this.vehicleMovementList = [];
     this.selectedEventData = {};
     if(this.selectedVideoSources != 'All Videos')
       this.getVideoSorceDataFromMap(this.selectedVideoSources);
     else{
       this.videoSourcesLists.forEach((value,key) => {
-      if(key === 0)
-        this.loaderService.show();
-        setTimeout(function(){
+        if(key == 0)
+          this.loaderService.show();
+        setTimeout(() => {
           this.getVideoSorceDataFromMap(value);
         },100);
       });
@@ -197,8 +196,8 @@ export class UploadVideoComponent implements OnInit {
     this.selectedEventData = {};
     this.socketDataMap = new Map();
     this.selectedFilesMsg.forEach((value,key) => {
-      this.videoSourcesLists.push(value.file.name);
-      this.socketDataMap.set(value.file.name+'', {'fileName':value.file.name,'count': 0,'listData':[]});
+      this.videoSourcesLists.push(value.fileName);
+      this.socketDataMap.set(value.fileName+'', {'fileName':value.fileName,'count': 0,'listData':[]});
       if(this.videoSourcesLists.length >= 1 && this.selectedFilesMsg.length == key +1)
         this.videoSourcesLists.unshift('All Videos');
     });
@@ -327,7 +326,7 @@ export class UploadVideoComponent implements OnInit {
   }
 
   openFileUploadModal(content) {
-    this.modalService.open(content, { size: 'lg', backdrop: 'static', centered: true });
+    this.modalService.open(content, { size: 'xl', backdrop: 'static', centered: true });
     this.selectedFilesMsg = [];
     this.proceedFileUpload = true;
   }
@@ -355,11 +354,11 @@ export class UploadVideoComponent implements OnInit {
             this.proceedFileUpload = false;
             inputObj.errMsg.push('Invalid file format.');
           }
-          if(parseFloat(sizeInMB) >= 500){
-            this.proceedFileUpload = false;
-            if(inputObj.errMsg.length == 0)
-              inputObj.errMsg.push('File size limit exceeded.');
-          }
+          // if(parseFloat(sizeInMB) >= 500){
+          //   this.proceedFileUpload = false;
+          //   if(inputObj.errMsg.length == 0)
+          //     inputObj.errMsg.push('File size limit exceeded.');
+          // }
           this.selectedFilesMsg.push(inputObj);
         }
         else
@@ -398,54 +397,52 @@ export class UploadVideoComponent implements OnInit {
 
         this.selectedFilesMsg[this.selectedFilesMsg.length - this.tempArrFiles.length]['loaderStatus'] = 'started';
         this.loaderService.sendLoadingText(CommonConstants.loaderMessages.loaderDisplayTextForUploadingFile);
-        this.httpService.formDataPost('uploadvideo', formData).subscribe(
-          (response: any) => {
-            let result = JSON.parse(response.returnObject[0]);
-            if(response.success){
-              this.selectedFilesMsg[this.selectedFilesMsg.length - this.tempArrFiles.length]['loaderStatus'] = result.status_code+'' == '200' ? 'completed' : 'error';
+        this.loaderService.show(); 
+        this.vehicleMovementList = [];
+        const url = environment.ANPRRestUrl;
+        var headers = {};
+        
+        fetch(url, {
+            method : "POST",
+            mode: 'cors',
+            headers: headers,
+            body: formData
+        })
+        .then((response) => {
+            if (response.ok) {
+              this.selectedFilesMsg[this.selectedFilesMsg.length - this.tempArrFiles.length]['loaderStatus'] = response.status+'' == '200' ? 'completed' : 'error';
               this.tempArrFiles.shift();
-            }          
-            if(response.success && this.tempArrFiles.length == 0){
-              this.loaderService.hide();
-              this.loaderService.sendLoadingText('');
-              // this.modalService.dismissAll();
+            }
+            return response.json();
+        })
+        .then(data => {          
+          if(!this.commonUIComponent.isEmptyObject(data) && this.tempArrFiles.length == 0){
+            this.loaderService.hide();
+            this.loaderService.sendLoadingText('');
+            // this.modalService.dismissAll();
 
-              if(result.status_code+'' == '200'){
-                // this.toastService.success('Video uploaded successfully');
-                // let inputData = {
-                //   "fromDateTime": this.dateFormater(this.fromDate)+":59",
-                //   "toDateTime": this.dateFormater(this.toDate)+":59"
-                // };
-                // this.httpService.post('offlinevi/getallvideosourcesbetweendateandtime', { "requestParams": inputData }).subscribe(
-                //   (response: any) => {
-                //     this.videoSourcesLists = response.returnObject;
-                //     if(this.videoSourcesLists.length >= 1)
-                //       this.videoSourcesLists.unshift('All Videos');
-                //     if(this.selectedFilesMsg.length >= 1)
-                //       this.getListMovements();
-                //     else{
-                //       this.selectedVideoSources = this.fileName;
-                //       this.getListMovementsByVideoSources();
-                //     }                    
-                //     this.loaderService.hide();
-                //   },
-                //   (error) => { //error() callback
-                //     this.httpService.serverErrorMethod(error);
-                // });                
-              }
+            if(data.status_code+'' == '200'){
+              this.toastService.success('Video uploaded successfully');
+              if(this.selectedFilesMsg.length >= 1)
+                this.selectedVideoSources = this.fileName;
+              else
+                this.selectedVideoSources = 'All Videos';
+              
+              this.getListMovementsByVideoSources();               
+            }
+            else{
+              this.toastService.error('Error occured while processing the video. Try again.');
+              if(this.tempArrFiles.length == 0)
+                this.ngOnInit();
               else{
-                this.toastService.error('Error occured while processing the video. Try again.');
-                if(this.tempArrFiles.length == 0)
-                  this.ngOnInit();
-                else{
-                  this.uploadVideo();
-                }
-              }              
-            }else
-              this.uploadVideo();           
-          },
-          (error) => { //error() callback
-            this.httpService.serverErrorMethod(error);
+                this.uploadVideo();
+              }
+            }              
+          }else
+            this.uploadVideo();     
+        })
+        .catch(function(error) {
+          console.log(error)
         });
       }
     },100);    
