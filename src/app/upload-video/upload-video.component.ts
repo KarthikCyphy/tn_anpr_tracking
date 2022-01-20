@@ -139,6 +139,7 @@ export class UploadVideoComponent implements OnInit {
   };
 
   getListMovementsByVideoSources() {
+    this.vehicleMovementList = [];
     this.selectedEventData = {};
     if(this.selectedVideoSources != 'All Videos')
       this.getVideoSorceDataFromMap(this.selectedVideoSources);
@@ -147,7 +148,8 @@ export class UploadVideoComponent implements OnInit {
         if(key == 0)
           this.loaderService.show();
         setTimeout(() => {
-          this.getVideoSorceDataFromMap(value);
+          if(value != 'All Videos')
+            this.getVideoSorceDataFromMap(value);
         },100);
       });
     }
@@ -398,7 +400,6 @@ export class UploadVideoComponent implements OnInit {
         this.selectedFilesMsg[this.selectedFilesMsg.length - this.tempArrFiles.length]['loaderStatus'] = 'started';
         this.loaderService.sendLoadingText(CommonConstants.loaderMessages.loaderDisplayTextForUploadingFile);
         this.loaderService.show(); 
-        this.vehicleMovementList = [];
         const url = environment.ANPRRestUrl;
         var headers = {};
         

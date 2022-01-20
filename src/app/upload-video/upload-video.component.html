@@ -15,7 +15,7 @@
                     <div class="form-group">
                       <label class="col-form-label" style="display: initial;">Video Source</label>
                       <select class="form-control" [(ngModel)]="selectedVideoSources" (ngModelChange)="getListMovementsByVideoSources()"
-                      [disabled]="!vehicleMovementList.length">
+                      >
                         <option value="" disabled>-- Select Video Sources--</option>
                         <option *ngFor="let videoSourcesList of videoSourcesLists" [ngValue]="videoSourcesList">{{videoSourcesList}}</option>
                       </select>
