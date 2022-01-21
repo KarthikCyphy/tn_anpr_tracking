@@ -9,4 +9,8 @@ export const content: Routes = [
     path: 'upload-video',
     loadChildren: () => import('../../upload-video/upload-video.module').then(m => m.UploadVideoModule),
   },
+  {
+    path: 'vehicle-search',
+    loadChildren: () => import('../../vehicle-search/vehicle-search.module').then(m => m.VehicleSearchModule),
+  },
 ];

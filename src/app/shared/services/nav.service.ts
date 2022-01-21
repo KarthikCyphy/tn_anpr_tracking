@@ -44,6 +44,9 @@ export class NavService {
 		{
 			path: '/app/upload-video', title: 'Upload Video', type: 'link', icon: 'upload', active: false,
 		},
+		{
+			path: '/app/vehicle-search', title: 'Vehicle Search', type: 'link', icon: 'search', active: false,
+		},
 	]
 
 	// Array
